@@ -1,5 +1,5 @@
 class Player {
-    constructor(pseudoX = 1, pseudoY = 1, direction = defaultConfig.direction) {
+    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight') {
         this.pseudoX = pseudoX;
         this.pseudoY = pseudoY;
         this.body = this._getBody(pseudoX, pseudoY);
