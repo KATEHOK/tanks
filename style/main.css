@@ -14,6 +14,8 @@
           box-sizing: border-box;
   width: 10px;
   height: 10px;
+  min-width: 10px;
+  min-height: 10px;
   background-color: royalblue;
   border: 1px solid #223980;
 }

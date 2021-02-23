@@ -29,6 +29,7 @@ class Player {
             if (!valuies.includes(code)) {
                 return;
             }
+            event.preventDefault();
             !/Arrow/.test(code) ? code = this._changeEventCodeToArrow(code) : null;
             console.log(code);
             code == this.direction ? this._move() : this._changeDirection(code);
