@@ -1,0 +1,3 @@
+const defaultConfig = {
+    direction: 'ArrowRight',
+}

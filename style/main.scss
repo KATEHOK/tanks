@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.main {}
+.earth {
+    border-collapse: collapse;
+    background-color: skyblue;
+    margin: 5vh auto;
+}
+.field {
+
+    &_cell {
+        box-sizing: border-box;
+        width: 10px;
+        height: 10px;
+        background-color: royalblue;
+        border: 1px solid rgb(34, 57, 128);
+    }
+}
+.player {
+    background-color: rgb(255, 207, 143);
+    border-color: rgb(211, 139, 45);
+}

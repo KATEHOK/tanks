@@ -1,1 +1,25 @@
-/* No CSS *//*# sourceMappingURL=main.css.map */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.earth {
+  border-collapse: collapse;
+  background-color: skyblue;
+  margin: 5vh auto;
+}
+
+.field_cell {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  background-color: royalblue;
+  border: 1px solid #223980;
+}
+
+.player {
+  background-color: #ffcf8f;
+  border-color: #d38b2d;
+}
+/*# sourceMappingURL=main.css.map */
