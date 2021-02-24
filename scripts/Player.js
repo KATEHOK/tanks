@@ -1,7 +1,9 @@
 class Player {
-    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight') {
+    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight', limit = 10) {
         this.pseudoX = pseudoX;
         this.pseudoY = pseudoY;
+        this.limit = limit;
+        this.time = new Date().getTime();
         this.body = this._getBody(pseudoX, pseudoY);
         this.direction = direction;
         console.log(this.direction);
@@ -35,7 +37,11 @@ class Player {
             if (/Arrow/.test(code)) {
                 code == this.direction ? this._move() : this._changeDirection(code);
             } else if (/Shift/.test(code)) {
-                this.shots.push(new Shot(this));
+                let time = new Date().getTime();
+                if ((time - this.time) >= (1000 / this.limit)) {
+                    this.shots.push(new Shot(this));
+                    this.time = time;
+                }
             }
         });
     }
