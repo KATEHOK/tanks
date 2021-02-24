@@ -5,6 +5,7 @@ class Player {
         this.body = this._getBody(pseudoX, pseudoY);
         this.direction = direction;
         console.log(this.direction);
+        this.shots = [];
         this._render();
         this._addKeydownEventListener();
     }
@@ -19,20 +20,23 @@ class Player {
         this._renderDirection();
     }
     /**
-     * Функция устанавливает обработчик нажатия кдавиш для каждого игрока
+     * Функция устанавливает обработчик нажатия клавиш для каждого игрока
      */
     _addKeydownEventListener() {
         window.addEventListener('keydown', event => {
-            let code = event.code
-            const valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            let code = event.code;
             console.log(code);
+            const valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftRight', 'ShiftLeft'];
             if (!valuies.includes(code)) {
                 return;
             }
             event.preventDefault();
-            !/Arrow/.test(code) ? code = this._changeEventCodeToArrow(code) : null;
-            console.log(code);
-            code == this.direction ? this._move() : this._changeDirection(code);
+            /Key/.test(code) ? code = this._changeEventCodeToArrow(code) : null;
+            if (/Arrow/.test(code)) {
+                code == this.direction ? this._move() : this._changeDirection(code);
+            } else if (/Shift/.test(code)) {
+                this.shots.push(new Shot(this));
+            }
         });
     }
     /**
@@ -63,7 +67,7 @@ class Player {
      * @param {Array} position - массив координат
      */
     _isPositionCorrect(position) {
-        console.dir(field);
+        // console.dir(field);
         let maxX = field.columns - 2;
         let maxY = field.rows - 2;
         return position[0] <= maxX && position[0] >= 1 && position[1] <= maxY && position[1] >= 1;
