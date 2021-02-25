@@ -1,13 +1,13 @@
 class Player {
-    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight', limit = 10) {
+    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight', limit = 5, speed = 60) {
         this.pseudoX = pseudoX;
         this.pseudoY = pseudoY;
         this.limit = limit;
+        this.speed = speed;
         this.time = new Date().getTime();
         this.body = this._getBody(pseudoX, pseudoY);
         this.direction = direction;
-        console.log(this.direction);
-        this.shots = [];
+        this.shots = { counter: 0 };
         this._render();
         this._addKeydownEventListener();
     }
@@ -27,7 +27,6 @@ class Player {
     _addKeydownEventListener() {
         window.addEventListener('keydown', event => {
             let code = event.code;
-            console.log(code);
             const valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftRight', 'ShiftLeft'];
             if (!valuies.includes(code)) {
                 return;
@@ -39,7 +38,10 @@ class Player {
             } else if (/Shift/.test(code)) {
                 let time = new Date().getTime();
                 if ((time - this.time) >= (1000 / this.limit)) {
-                    this.shots.push(new Shot(this));
+                    console.log(`--> Piu <--`)
+                    let name = new Date().getTime();
+                    this.shots[name] = new Shot(this, name);
+                    this.shots.counter++;
                     this.time = time;
                 }
             }

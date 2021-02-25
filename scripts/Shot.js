@@ -1,13 +1,13 @@
 class Shot {
-    constructor(parent, speed = 20) {
+    constructor(parent, name) {
         // console.dir(parent);
-        this.id = new Date().getTime();
-        this.speed = speed;
+        this.id = name;
+        this.parent = parent;
         this.direction = parent.direction.substr(5);
-        this.position = this._getPosition(parent.body);
+        this.position = this._getPosition();
         this._render();
         this.lastPosition = this.position;
-        this.key = setInterval(this._cycle.bind(this), this.speed);
+        this.key = setInterval(this._cycle.bind(this), 1000 / this.parent.speed);
     }
     /**
      * Функция, являясь циклом жизни снаряда (запущена в интервале this.speed),
@@ -19,8 +19,10 @@ class Shot {
         let status = true;
         this._move();
         this.position ? this._render() : status = false;
-        console.dir(status, this)
-        !status ? clearInterval(this.key) : null;
+        if (!status) {
+            clearInterval(this.key);
+            delete this.parent.shots[this.id];
+        }
     }
     /**
      * Функция сохраняет в this.lastPosition текущую позицию,
@@ -53,22 +55,21 @@ class Shot {
      * @returns {Array} - массив координат снаряда или null,
      * если игрок нацелен вплотную на препятствие
      */
-    _getPosition(parent) {
-        // console.log(parent)
+    _getPosition() {
         let position = null;
         let gun = null;
         switch (this.direction) {
             case 'Up':
-                gun = [...parent[1]];
+                gun = [...this.parent.body[1]];
                 break;
             case 'Down':
-                gun = [...parent[7]];
+                gun = [...this.parent.body[7]];
                 break;
             case 'Left':
-                gun = [...parent[3]];
+                gun = [...this.parent.body[3]];
                 break;
             case 'Right':
-                gun = [...parent[5]];
+                gun = [...this.parent.body[5]];
                 break;
         }
         let nextPosition = this._getNextPosition(...gun);
