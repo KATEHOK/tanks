@@ -5,9 +5,13 @@ class Shot {
         this.parent = parent;
         this.direction = parent.direction.substr(5);
         this.position = this._getPosition();
-        this._render();
-        this.lastPosition = this.position;
-        this.key = setInterval(this._cycle.bind(this), 1000 / this.parent.speed);
+        if (this.position) {
+            this._render();
+            this.lastPosition = this.position;
+            this.key = setInterval(this._cycle.bind(this), 1000 / this.parent.speed);
+        } else {
+            delete this.parent.shots[this.id];
+        }
     }
     /**
      * Функция, являясь циклом жизни снаряда (запущена в интервале this.speed),
