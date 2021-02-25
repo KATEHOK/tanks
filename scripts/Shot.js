@@ -5,13 +5,15 @@ class Shot {
         this.parent = parent;
         this.direction = parent.direction.substr(5);
         this.position = this._getPosition();
-        if (this.position) {
-            this._render();
-            this.lastPosition = this.position;
-            this.key = setInterval(this._cycle.bind(this), 1000 / this.parent.speed);
-        } else {
-            delete this.parent.shots[this.id];
-        }
+        this.position ? this._render() : null;
+        this.lastPosition = this.position;
+        this.key = setInterval(this._cycle.bind(this), 1000 / this.parent.speed);
+    }
+    /**
+     * Функция удаляет объект снаряда
+     */
+    _delete() {
+        delete this.parent.shots[this.id];
     }
     /**
      * Функция, являясь циклом жизни снаряда (запущена в интервале this.speed),
@@ -20,12 +22,17 @@ class Shot {
      * прерывает цикл жизни снаряда
      */
     _cycle() {
+        if (this.goDie) {
+            clearInterval(this.key);
+            this._delete();
+            return;
+        }
         let status = true;
         this._move();
         this.position ? this._render() : status = false;
         if (!status) {
             clearInterval(this.key);
-            delete this.parent.shots[this.id];
+            this._delete();
         }
     }
     /**
@@ -43,6 +50,7 @@ class Shot {
      * Функция отрисовывает снаряд на поле
      */
     _render() {
+        this.error ? this._delete() : null;
         let cellEl = document.querySelector(`.field_cell[data-x="${this.position[0]}"][data-y="${this.position[1]}"]`);
         !cellEl.classList.contains('shot') ? cellEl.classList.add('shot') : null;
     }
@@ -78,6 +86,7 @@ class Shot {
         }
         let nextPosition = this._getNextPosition(...gun);
         this._isPositionCorrect(nextPosition) ? position = [...nextPosition] : null;
+        !position ? this.goDie = true : null;
         return position;
     }
     /**
