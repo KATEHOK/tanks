@@ -36,7 +36,7 @@ class Field {
     _createPlayers(count) {
         count > 4 ? count = 4 : null;
         for (let counter = 0; counter < count; counter++) {
-            this.players[String(counter)] = new Player(String(counter), this);
+            this.players[String(counter)] = new Player(String(counter), this, count);
             this.players.count++;
         }
     }

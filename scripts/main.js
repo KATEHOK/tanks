@@ -1,1 +1,1 @@
-const field = new Field(80, 30, 4);
+const field = new Field(80, 30, 2);
