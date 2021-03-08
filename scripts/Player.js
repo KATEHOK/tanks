@@ -1,5 +1,5 @@
 class Player {
-    constructor(index, parent, count, limit = 5, speed = 60, health = 3, maxShots = 3) {
+    constructor(index, parent, count, limit = 5, speed = 60, health = 3, maxShots = 2) {
         if (count == '1') {
             this.royal = true;
         } else {
