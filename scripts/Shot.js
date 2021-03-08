@@ -13,6 +13,7 @@ class Shot {
      * Функция удаляет объект снаряда
      */
     _delete() {
+        this.parent.shots.count--;
         delete this.parent.shots[this.id];
     }
     /**

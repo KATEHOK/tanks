@@ -29,4 +29,14 @@
   background-color: #ff3019;
   border-color: #700b00;
 }
+
+.damage {
+  background-color: #9e1e10;
+  border-color: #4b0700;
+}
+
+.dead {
+  background-color: #240400;
+  border-color: black;
+}
 /*# sourceMappingURL=main.css.map */

@@ -1,5 +1,5 @@
 class Player {
-    constructor(index, parent, count, limit = 5, speed = 60, health = 3) {
+    constructor(index, parent, count, limit = 5, speed = 60, health = 3, maxShots = 3) {
         if (count == '1') {
             this.royal = true;
         } else {
@@ -8,6 +8,7 @@ class Player {
         if (count == 2 && index == '1') {
             index = '3';
         }
+        this.maxShots = maxShots;
         this.alive = true;
         this.id = index;
         this._setValuies();
@@ -22,6 +23,10 @@ class Player {
         this._render();
         this._addKeydownEventListener();
     }
+    /**
+     * функция расчитывает событие атаки
+     * @param {Number} power сила атаки
+     */
     attacked(power = 1) {
         if (this.health - power <= 0) {
             this.health = 0;
@@ -31,6 +36,10 @@ class Player {
             this._renderDamaged();
         }
     }
+    /**
+     * функция отрисовывает эффект повреждения
+     * @param {Boolean} category степень повреждения (true - повреждение / false - уничтожение)
+     */
     _renderDamaged(category = true) {
         if (category) {
             this.body.forEach((cell) => {
@@ -128,13 +137,14 @@ class Player {
                 code == this.direction ? this._move() : this._changeDirection(code);
             } else if (/Shift/.test(code)) {
                 let time = new Date().getTime();
-                if ((time - this.time) >= (1000 / this.limit)) {
+                if (this.shots.count < this.maxShots && (time - this.time) >= (1000 / this.limit)) {
                     console.log(`--> Piu <--`)
                     let name = new Date().getTime();
                     this.shots[name] = new Shot(this, name);
                     this.shots.count++;
                     this.time = time;
                 }
+                this.shots.count >= this.maxShots ? console.log('--> Nope <--') : null;
             }
         });
     }
