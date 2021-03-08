@@ -1,15 +1,45 @@
 class Player {
-    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight', limit = 5, speed = 60) {
-        this.pseudoX = pseudoX;
-        this.pseudoY = pseudoY;
+    constructor(index, parent, limit = 5, speed = 60) {
+        this.id = index;
+        this.parent = parent;
         this.limit = limit;
         this.speed = speed;
         this.time = new Date().getTime();
-        this.body = this._getBody(pseudoX, pseudoY);
-        this.direction = direction;
-        this.shots = { counter: 0 };
+        this._calcPseudoCoordsAndDirection();
+        this.body = this._getBody();
+        this.shots = { count: 0 };
         this._render();
         this._addKeydownEventListener();
+    }
+    /**
+     * функция по индексу игрока расчитывает псевдо-координаты и направление игрока
+     */
+    _calcPseudoCoordsAndDirection() {
+        switch (this.id) {
+            case '0':
+                this.pseudoX = 1;
+                this.pseudoY = 1;
+                this.direction = 'ArrowRight';
+                break;
+            case '1':
+                console.dir(this);
+                this.pseudoX = this.parent.columns - 2;
+                this.pseudoY = 1;
+                this.direction = 'ArrowLeft';
+                break;
+            case '2':
+                console.dir(this);
+                this.pseudoX = 1;
+                this.pseudoY = this.parent.rows - 2;
+                this.direction = 'ArrowRight';
+                break;
+            case '3':
+                console.dir(this);
+                this.pseudoX = this.parent.columns - 2;
+                this.pseudoY = this.parent.rows - 2;
+                this.direction = 'ArrowLeft';
+                break;
+        }
     }
     /**
      * Функция отображает на поле корректное положение игрока
@@ -41,7 +71,7 @@ class Player {
                     console.log(`--> Piu <--`)
                     let name = new Date().getTime();
                     this.shots[name] = new Shot(this, name);
-                    this.shots.counter++;
+                    this.shots.count++;
                     this.time = time;
                 }
             }
@@ -67,7 +97,7 @@ class Player {
         this._remove();
         this.pseudoX = nextPosition[0];
         this.pseudoY = nextPosition[1];
-        this.body = this._getBody(this.pseudoX, this.pseudoY);
+        this.body = this._getBody();
         this._render();
     }
     /**
@@ -175,7 +205,7 @@ class Player {
      * @returns {Array} - список пар координат клеток игрока,
      * перечень: слева - направо, сверху - вниз
      */
-    _getBody(pseudoX, pseudoY) {
+    _getBody(pseudoX = this.pseudoX, pseudoY = this.pseudoY) {
         return [
             [pseudoX, pseudoY], [pseudoX + 1, pseudoY], [pseudoX + 2, pseudoY],
             [pseudoX, pseudoY + 1], [pseudoX + 1, pseudoY + 1], [pseudoX + 2, pseudoY + 1],

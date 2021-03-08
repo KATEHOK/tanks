@@ -1,2 +1,1 @@
-const field = new Field(80, 30);
-const player1 = new Player();
+const field = new Field(80, 30, 4);
