@@ -1,15 +1,86 @@
 class Player {
-    constructor(pseudoX = 1, pseudoY = 1, direction = 'ArrowRight', limit = 5, speed = 60) {
-        this.pseudoX = pseudoX;
-        this.pseudoY = pseudoY;
+    constructor(index, parent, count, limit = 5, speed = 60, health = 3, maxShots = 2) {
+        if (count == '1') {
+            this.royal = true;
+        } else {
+            this.royal = false;
+        }
+        if (count == 2 && index == '1') {
+            index = '3';
+        }
+        this.maxShots = maxShots;
+        this.alive = true;
+        this.id = index;
+        this._setValuies();
+        this.parent = parent;
         this.limit = limit;
         this.speed = speed;
+        this.health = health;
         this.time = new Date().getTime();
-        this.body = this._getBody(pseudoX, pseudoY);
-        this.direction = direction;
-        this.shots = { counter: 0 };
+        this._calcPseudoCoordsAndDirection();
+        this.body = this._getBody();
+        this.shots = { count: 0 };
         this._render();
         this._addKeydownEventListener();
+    }
+    /**
+     * функция расчитывает событие атаки
+     * @param {Number} power сила атаки
+     */
+    attacked(power = 1) {
+        if (this.health - power <= 0) {
+            this.health = 0;
+            this._renderDamaged(false);
+        } else {
+            this.health -= power;
+            this._renderDamaged();
+        }
+    }
+    /**
+     * функция отрисовывает эффект повреждения
+     * @param {Boolean} category степень повреждения (true - повреждение / false - уничтожение)
+     */
+    _renderDamaged(category = true) {
+        if (category) {
+            this.body.forEach((cell) => {
+                let cellEl = document.querySelector(`.field_cell[data-x="${cell[0]}"][data-y="${cell[1]}"]`);
+                cellEl.classList.add('damage');
+                setTimeout(() => cellEl.classList.remove('damage'), 30);
+            });
+        } else {
+            this.alive = false;
+            this.body.forEach((cell) => {
+                let cellEl = document.querySelector(`.field_cell[data-x="${cell[0]}"][data-y="${cell[1]}"]`);
+                cellEl.classList.add('dead');
+            });
+        }
+    }
+    /**
+     * функция по индексу игрока расчитывает псевдо-координаты и направление игрока
+     */
+    _calcPseudoCoordsAndDirection() {
+        switch (this.id) {
+            case '0':
+                this.pseudoX = 1;
+                this.pseudoY = 1;
+                this.direction = 'ArrowRight';
+                break;
+            case '1':
+                this.pseudoX = this.parent.columns - 2;
+                this.pseudoY = 1;
+                this.direction = 'ArrowLeft';
+                break;
+            case '2':
+                this.pseudoX = 1;
+                this.pseudoY = this.parent.rows - 2;
+                this.direction = 'ArrowRight';
+                break;
+            case '3':
+                this.pseudoX = this.parent.columns - 2;
+                this.pseudoY = this.parent.rows - 2;
+                this.direction = 'ArrowLeft';
+                break;
+        }
     }
     /**
      * Функция отображает на поле корректное положение игрока
@@ -22,28 +93,58 @@ class Player {
         this._renderDirection();
     }
     /**
+     * функция устанавливает возможные варианты управления
+     */
+    _setValuies() {
+        if (this.royal) {
+            console.dir(this);
+            this.valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ShiftLeft', 'AltLeft', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftRight', 'KeyU', 'KeyH', 'KeyJ', 'KeyK', 'AltRight', 'Space', 'Numpad8', 'Numpad4', 'Numpad5', 'Numpad6', 'NumpadEnter', 'Numpad0'];
+            return;
+        }
+        switch (this.id) {
+            case '0':
+                this.valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ShiftLeft', 'AltLeft'];
+                break;
+            case '1':
+                this.valuies = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftRight'];
+                break;
+            case '2':
+                this.valuies = ['KeyU', 'KeyH', 'KeyJ', 'KeyK', 'AltRight', 'Space'];
+                break;
+            case '3':
+                this.valuies = ['Numpad8', 'Numpad4', 'Numpad5', 'Numpad6', 'NumpadEnter', 'Numpad0'];
+                break;
+        }
+    }
+    /**
      * Функция устанавливает обработчик нажатия клавиш для каждого игрока
      */
     _addKeydownEventListener() {
         window.addEventListener('keydown', event => {
+            if (!this.alive) {
+                return;
+            }
             let code = event.code;
-            const valuies = ['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftRight', 'ShiftLeft'];
-            if (!valuies.includes(code)) {
+            if (!this.valuies.includes(code)) {
                 return;
             }
             event.preventDefault();
-            /Key/.test(code) ? code = this._changeEventCodeToArrow(code) : null;
+            /Key/.test(code) ? code = this._changeKeyToArrow(code) : null;
+            /Numpad/.test(code) ? code = this._changeNumpadToArrow(code) : null;
+            /Alt/.test(code) ? code = 'Shift' : null;
+            /Space/.test(code) ? code = 'Shift' : null;
             if (/Arrow/.test(code)) {
                 code == this.direction ? this._move() : this._changeDirection(code);
             } else if (/Shift/.test(code)) {
                 let time = new Date().getTime();
-                if ((time - this.time) >= (1000 / this.limit)) {
+                if (this.shots.count < this.maxShots && (time - this.time) >= (1000 / this.limit)) {
                     console.log(`--> Piu <--`)
                     let name = new Date().getTime();
                     this.shots[name] = new Shot(this, name);
-                    this.shots.counter++;
+                    this.shots.count++;
                     this.time = time;
                 }
+                this.shots.count >= this.maxShots ? console.log('--> Nope <--') : null;
             }
         });
     }
@@ -67,7 +168,7 @@ class Player {
         this._remove();
         this.pseudoX = nextPosition[0];
         this.pseudoY = nextPosition[1];
-        this.body = this._getBody(this.pseudoX, this.pseudoY);
+        this.body = this._getBody();
         this._render();
     }
     /**
@@ -119,23 +220,36 @@ class Player {
      * @param {String} code - значение event.code
      * @returns {String} - значение параметра, конвертированное в Arrow-формат
      */
-    _changeEventCodeToArrow(code) {
+    _changeKeyToArrow(code) {
         code = code.substr(3);
-        switch (code) {
-            case 'W':
-                code = 'ArrowUp';
-                break;
-            case 'S':
-                code = 'ArrowDown';
-                break;
-            case 'A':
-                code = 'ArrowLeft';
-                break;
-            case 'D':
-                code = 'ArrowRight';
-                break;
+        if (code == 'W' || code == 'U') {
+            return 'ArrowUp';
+        } else if (code == 'S' || code == 'J') {
+            return 'ArrowDown';
+        } else if (code == 'A' || code == 'H') {
+            return 'ArrowLeft';
+        } else if (code == 'D' || code == 'K') {
+            return 'ArrowRight';
         }
-        return code;
+    }
+    /**
+    * Функция меняет значение клавишной "стрелки" на Arrow+
+    * @param {String} code - значение event.code
+    * @returns {String} - значение параметра, конвертированное в Arrow-формат
+    */
+    _changeNumpadToArrow(code) {
+        code = code.substr(6);
+        if (code == '8') {
+            return 'ArrowUp';
+        } else if (code == '5') {
+            return 'ArrowDown';
+        } else if (code == '4') {
+            return 'ArrowLeft';
+        } else if (code == '6') {
+            return 'ArrowRight';
+        } else if (code == '0' || code == 'Enter') {
+            return 'Shift';
+        }
     }
     /**
      * Функция корректирует отображение игрока в на поле,
@@ -175,7 +289,7 @@ class Player {
      * @returns {Array} - список пар координат клеток игрока,
      * перечень: слева - направо, сверху - вниз
      */
-    _getBody(pseudoX, pseudoY) {
+    _getBody(pseudoX = this.pseudoX, pseudoY = this.pseudoY) {
         return [
             [pseudoX, pseudoY], [pseudoX + 1, pseudoY], [pseudoX + 2, pseudoY],
             [pseudoX, pseudoY + 1], [pseudoX + 1, pseudoY + 1], [pseudoX + 2, pseudoY + 1],
